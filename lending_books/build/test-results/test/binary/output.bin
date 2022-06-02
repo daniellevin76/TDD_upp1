@@ -1,0 +1,6 @@
+Qcomments in test [It was an interesting read, it was a nice read, Strange book]
+-SELECT * FROM REVIEW_TABLE WHERE bookId = 0
+@[It was an interesting read, it was a nice read, Strange book]
+Ndbhandler ["It was an interesting read","it was a nice read","Strange book"]
+-SELECT * FROM REVIEW_TABLE WHERE bookId = 0
+@[It was an interesting read, it was a nice read, Strange book]
