@@ -1,8 +1,6 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import jdk.swing.interop.SwingInterOpUtils;
-
-import java.util.ArrayList;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DBHandler {
 
@@ -16,9 +14,7 @@ public class DBHandler {
     //This method only handles book data retrieval from database
     //Assuming data for each book is added to Book object which in turn is added to
     //arrayList of Book object
-    public ArrayList<Book> retrieveBooksFromDB(String keyWord, String searchWord) {
-
-        String query = "SELECT * FROM BOOK_TABLE WHERE " + keyWord + " like " + searchWord;
+    public ArrayList<Book> retrieveBooksFromDB(String query) {
 
         ArrayList<Book> retrievedBooks = db.retrieveBooks(query);
         if (retrievedBooks.isEmpty()) {
@@ -31,56 +27,69 @@ public class DBHandler {
     //Assuming data for each review is added to BookReview object which in turn is added to
     //arrayList of BookReview object
 
-    public ArrayList<String> retrieveReviewsFromDB(String keyWord, String searchWord) {
+    public ArrayList<ArrayList<String>> retrieveReviewsFromDB(String query) {
 
-        String query = "SELECT * FROM REVIEW_TABLE WHERE " + keyWord + " = " + searchWord;
-
-        ArrayList<String> retrievedReviews = db.retrieveBookReviews(query);
-        System.out.println(query);
-
+        ArrayList<ArrayList<String>> retrievedReviews = db.retrieveBookReviews(query);
+        if (retrievedReviews.isEmpty()) {
+            displayMessage();
+        }
         return retrievedReviews;
     }
 
 
     public ArrayList<Book> searchBookByTitle(String title) {
-
-        ArrayList<Book> retrieveBooks = retrieveBooksFromDB("title", title);
-
-
-        return retrieveBooks;
-    }
-
-    private void displayMessage() {
-        System.out.println("Search did not yield any result");
+        System.out.println("SELECT * FROM BOOK_TABLE WHERE title like " + title);
+        return retrieveBooksFromDB("SELECT * FROM BOOK_TABLE WHERE title like " + title);
     }
 
     public ArrayList<Book> searchBookByAuthor(String author) {
-        return retrieveBooksFromDB("author", author);
-
+        return retrieveBooksFromDB( "SELECT * FROM BOOK_TABLE WHERE author like " + author);
     }
 
     public ArrayList<Book> searchBookByGenre(String genre) {
-        return retrieveBooksFromDB("genre", genre);
+        return retrieveBooksFromDB("SELECT * FROM BOOK_TABLE WHERE genre like " + genre) ;
+    }
+
+    public ArrayList<Book> searchBookById(String bookId) {
+        return retrieveBooksFromDB("SELECT * FROM BOOK_TABLE WHERE bookId = " + bookId);
     }
 
 
     //Retrieve customers reviews (comments) for a specific book, reached by bookId
-    public String retrieveReviews(String bookId) {
+    public ArrayList<ArrayList<String>> searchBookReviewsByBookId(String bookId) {
+         return db.retrieveBookReviews("SELECT * FROM REVIEW_TABLE WHERE bookId = " + bookId);
+    }
+
+    public ArrayList<String> displayComments(ArrayList<ArrayList<String>> retrievedReviews) {
+        ArrayList<String> comments =new ArrayList<>();
+
+        for(int i = 0; i < retrievedReviews.size();i++){
+            comments.add(retrievedReviews.get(i).get(0));
+        }
+
+        return comments;
+    }
 
 
-        ArrayList<String> retrieveReviews = retrieveReviewsFromDB("bookId", bookId);
-        // Use this builder to construct a Gson instance when you need to set configuration options other than the default.
-        GsonBuilder gsonBuilder = new GsonBuilder();
+    //Retrieve Reviews with highest rates from Data base
+    public ArrayList<Object> retrieveReviewsWithHighestRates() {
 
-        // This is the main class for using Gson. Gson is typically used by first constructing a Gson instance and then invoking toJson(Object) or fromJson(String, Class) methods on it.
-        // Gson instances are Thread-safe so you can reuse them freely across multiple threads.
-        Gson gson = gsonBuilder.create();
+        String query = "SELECT BOOK_TABLE.id, BOOK_TABLE.title, BOOK_TABLE.author," +
+                " REVIEW_TABLE.comment, REVIEW_TABLE.rate, REVIEW_TABLE.rate_mean FROM BOOK_TABLE" +
+                " \n INNER JOIN REVIEW_TABLE ON BOOK_TABLE.bookId=REVIEW_TABLE.bookId"+
+                "ORDER BY rate_mean DESC";
 
-        String JSONObject = gson.toJson(retrieveReviews);
+        ArrayList<Object> retrievedReviewsFromDB = db.retrieveBookReviewsTitleAuthor(query);
+     
+        return retrievedReviewsFromDB;
+    }
 
-        //for(int i = 0; i < retrieveReviews.size())
-        System.out.println(retrieveReviews);
+    //Display books title, author mean rate and comments with the highest rates
 
-        return JSONObject;
+
+
+
+    private void displayMessage() {
+        System.out.println("Search did not yield any result");
     }
 }

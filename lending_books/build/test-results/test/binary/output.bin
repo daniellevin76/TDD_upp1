@@ -1,6 +1,1 @@
-Qcomments in test [It was an interesting read, it was a nice read, Strange book]
--SELECT * FROM REVIEW_TABLE WHERE bookId = 0
-@[It was an interesting read, it was a nice read, Strange book]
-Ndbhandler ["It was an interesting read","it was a nice read","Strange book"]
--SELECT * FROM REVIEW_TABLE WHERE bookId = 0
-@[It was an interesting read, it was a nice read, Strange book]
+þbooks[[Anna Karenina, Leo Tolstoy, 4.4, [A masterpiece, Very difficult read]], [Animal Farm, George Orwell, 4.1, [Strange book, Orwell was a genius, So relevant today]], [Rescue, Jennifer Nielsen, 4.0, [It was an interesting read, It was a crazy book]], [The Resurrectionist,  E. B. Hudspeth, 4.0, [Strange book]], [The Shining, Stephen King, 3.9, [One of the scariest books ever, It was better than the movie]], [It, Stephen King, 3.7, [Not my cup of tea]], [Frankenstein, Mary Shelley, 3.7, [A must read]]]
